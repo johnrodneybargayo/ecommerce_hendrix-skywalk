@@ -1,0 +1,159 @@
+@import "../../styles/global.scss"; // Import the global styles for fonts
+
+.home-banner-text {
+  color: #fff;
+  font-size: 6em;
+  margin-bottom: 10px;
+  margin-left: 25px;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.home-banner-subtext {
+  display: flex;
+  font-size: 2.5em;
+  align-items: center;
+  margin-top: 12em;
+  margin-left: 10em;
+  position: absolute;
+  color: #fff;
+  justify-content: center;
+}
+
+.container-text {
+  display: flex;
+  position: relative;
+  top: 0;
+}
+/* Additional styles for responsiveness */
+@media (max-width: 768px) {
+  .home-banner-text {
+    font-size: 1.5em; /* Adjust font size for smaller screens */
+  }
+
+  .home-banner-merchtext {
+    font-size: 1.2em; /* Adjust font size for smaller screens */
+  }
+}
+
+h4 {
+  margin: 0.5rem 0;
+  position: relative;
+  text-align: center;
+  bottom: 23em;
+  left: 18em;
+  font-size: 25px;
+  color: #fff; // Adjust as needed for spacing
+}
+
+h5 {
+  margin: 0.5rem 0;
+  position: relative;
+  text-align: center;
+  bottom: 26em;
+  left: 30em;
+  font-size: 25px;
+  color: #fff; // Adjust as needed for spacing
+}
+
+
+.image-gallery {
+  bottom: 0;
+  display: block;
+  height: 0;
+  margin-bottom: 0;
+  position: relative;
+  padding: 0;
+  top: 0;
+  z-index: -1;
+}
+
+iframe {
+  border: none;
+  width: 100%;
+  height: 128vh;
+  position: relative;
+  left: 0px;
+  top: -18rem;
+  overflow: hidden;
+  z-index: -100;
+}
+
+// Additional styles for responsiveness
+@media (max-width: 768px) {
+  .video-banner {
+    max-height: 300px; // Adjust for smaller screens
+  }
+}
+
+.footer-image {
+  width: 100%;
+  height: 225px;
+  position: relative;
+  bottom: 24rem;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap; /* Wrap images to the next line on smaller screens */
+}
+
+.flowers-image {
+  width: 28%;
+  height: 120px;
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  bottom: 34rem;
+  left: 25px;
+}
+
+.gif-container {
+  bottom: 30rem;
+  right: 5rem;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0;
+  position: relative;
+}
+
+.gif-image {
+  height: auto;
+  width: 285px;
+  z-index: 1;
+}
+
+.productlist-section {
+  display: flex;
+}
+
+
+.video-play {
+  display: flex;
+  position: absolute;
+  top: 35rem;
+  left: 28rem;
+  font-size: 1.75rem;
+  font-family: $Grandstander;
+  cursor: pointer;
+  outline: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: $borderRadius;
+  margin: 10px;
+  border: 1px solid transparent;
+  transition: 0.3s ease all;
+
+  &:hover {
+    border-color: #FDE767;
+    background: #FDE767;
+    color: #FDE767;
+  }
+}
+
+
+.video-play.active {
+  border-color: $primary-color;
+  background: rgba($primary-color, 0.1);
+  color: $primary-color;
+}
