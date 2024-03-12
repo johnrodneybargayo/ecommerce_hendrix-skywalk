@@ -166,8 +166,10 @@
 
   .userName {
     margin-right: $spacing-sm;
-    color: $light;
-    font-weight: bold;
+    color: $dark;
+    cursor: pointer;
+    font-weight: 400;
+    font-size: 20px;
   }
 
 
@@ -175,17 +177,19 @@
     position: absolute;
     top: 100%;
     right: 0;
-    background: rgba($dark, 0.9);
+    left: 38rem;
+    background: rgba(29, 29, 29, 0.9);
+    -webkit-backdrop-filter: blur(2px);
     backdrop-filter: blur(2px);
-    border-radius: $borderRadius;
+    border-radius: 12px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    margin-top: $spacing-sm;
-    visibility: hidden;
-    opacity: 0;
+    opacity: 1;
     transition: 0.3s ease all;
-
+    width: 150px;
+    height: 135px;
+    
     a,
     button {
       padding: $spacing-sm;
@@ -215,4 +219,9 @@
       opacity: 1;
     }
   }
+}
+
+
+.btn_ninja {
+  display: none;
 }

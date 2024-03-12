@@ -13,7 +13,6 @@ const AppRoutes: React.FC = () => {
   const [isLoggedIn, setLoggedIn] = useState(false);
 
   const handleLogin = (username: string, password: string) => {
-    // Your login logic here
     setLoggedIn(true);
   };
 

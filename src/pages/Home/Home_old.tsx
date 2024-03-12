@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import '../../styles/home.scss'; // Import the video banner styles
 import Header from '../../components/common/Header/Header';
 import Footer from '../../components/common/Footer/Footer';
-import ProductList from '../../components/Shop/ProductList/ProductList';
+// import ProductList from '../../components/Shop/ProductList/ProductList';
 import api from '../../services/api';
 import Gif from '../../assets/images/hendrix_ninja.gif'; // Adjust the path based on your project structure
 
@@ -54,7 +54,7 @@ const HomePage = () => {
         <img src={Gif} alt="Your GIF" className="gif-image" />
       </div>
       <section className="productlist-section">
-        <ProductList />
+
       </section>
      
       <Footer /> 

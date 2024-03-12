@@ -1,70 +1,64 @@
 // Header.tsx
-import React, { useEffect, useState } from 'react';
-import { BiMenuAltRight } from 'react-icons/bi';
-import { AiOutlineClose } from 'react-icons/ai';
-import { FaUserNinja } from 'react-icons/fa6';
-import { FaCartShopping } from 'react-icons/fa6';
-import { Link, useNavigate } from 'react-router-dom';
-import Tooltip from '../../common/Tooltip/Tooltip';
-import classes from './Header.module.scss';
+import React, { useEffect, useState } from "react";
+import { BiMenuAltRight } from "react-icons/bi";
+import { AiOutlineClose } from "react-icons/ai";
+import { FaUserNinja } from "react-icons/fa6";
+import { FaCartShopping } from "react-icons/fa6";
+import { Link, useNavigate } from "react-router-dom";
+import Tooltip from "../../common/Tooltip/Tooltip";
+import classes from "./Header.module.scss";
 
 const Header: React.FC = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [windowSize, setWindowSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
+
 
   const [isLoggedIn, setLoggedIn] = useState(false);
-  const [userName, setUserName] = useState<string>('');
+  const [userName, setUserName] = useState<string>("");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [submenuOpen, setSubmenuOpen] = useState(false);
 
   const history = useNavigate();
 
   useEffect(() => {
-    const userInfo = localStorage.getItem('userInfo');
-    const accessToken = localStorage.getItem('accessToken');
+    const userInfo = localStorage.getItem("userInfo");
+    const accessToken = localStorage.getItem("accessToken");
     const userIsLoggedIn = userInfo !== null && accessToken;
-  
+
     if (userIsLoggedIn) {
-      const userInfoData = JSON.parse(userInfo!);
-      setUserName(userInfoData.username ?? '');
+      try {
+        const userInfoData = JSON.parse(userInfo!);
+        setUserName(userInfoData.username ?? "");
+      } catch (error) {
+        console.error("Error parsing userInfo:", error);
+      }
     }
-  
-    setLoggedIn(!!userIsLoggedIn); // Explicitly cast to boolean
-  }, []);
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
+    console.log(isLoggedIn);
 
-    window.addEventListener('resize', handleResize);
+    setLoggedIn(!!userIsLoggedIn);
+  }, [isLoggedIn]);
 
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
 
-  useEffect(() => {
-    if (windowSize.width > 768 && menuOpen) {
-      setMenuOpen(false);
-    }
-  }, [windowSize.width, menuOpen]);
 
   const openUserMenuHandler = () => {
-    setMenuOpen(true);
+    if (isLoggedIn) {
+      setMenuOpen(true);
+    } else {
+      setSubmenuOpen(true);
+    }
   };
-
   const menuToggleHandler = () => {
     setMenuOpen((prevMenuOpen) => !prevMenuOpen);
+    // Close the submenu when the main menu is toggled
+    setSubmenuOpen(false);
+  };
+
+  const openUserSubMenuHandler = () => {
+    setSubmenuOpen(true);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('userInfo');
+    localStorage.removeItem("userInfo");
     setLoggedIn(false);
-    history('/');
+    history("/");
   };
 
   return (
@@ -78,7 +72,10 @@ const Header: React.FC = () => {
           />
         </Link>
 
-        <nav className={`${classes.header__content__nav} ${menuOpen ? classes.isMenu : ''}`}>
+        <nav
+          className={`${classes.header__content__nav} ${menuOpen ? classes.isMenu : ""
+            }`}
+        >
           <ul>
             <li>
               <Link to="/" title="Home">
@@ -103,26 +100,31 @@ const Header: React.FC = () => {
           </ul>
           <Link to="/shopping-cart">
             <Tooltip text="Cart">
-              <button className={classes.btn_cart} onClick={openUserMenuHandler}>
+              <button
+                className={classes.btn_cart}
+                onClick={openUserMenuHandler}
+              >
                 <FaCartShopping />
               </button>
             </Tooltip>
           </Link>
           {isLoggedIn ? (
             <div className={classes.userContainer}>
-              <span className={classes.userName}>{userName}</span>
-              <button onClick={openUserMenuHandler}>
+              <span className={classes.userName} onClick={openUserSubMenuHandler}>
+                {userName}
+              </span>
+              <button onClick={openUserMenuHandler} className={classes.btn_ninja}>
                 <FaUserNinja />
               </button>
-              {menuOpen && (
+              {submenuOpen && (
                 <ul className={classes.subMenu}>
                   <li>
-                    <Link to="/profile" onClick={menuToggleHandler}>
+                    <Link to="/profile" onClick={() => setSubmenuOpen(false)}>
                       Profile
                     </Link>
                   </li>
                   <li>
-                    <Link to="/orders" onClick={menuToggleHandler}>
+                    <Link to="/orders" onClick={() => setSubmenuOpen(false)}>
                       Orders
                     </Link>
                   </li>
@@ -135,7 +137,10 @@ const Header: React.FC = () => {
           ) : (
             <Link to="api/login">
               <Tooltip text="Login">
-                <button className={classes.btn_cart} onClick={openUserMenuHandler}>
+                <button
+                  className={classes.btn_cart}
+                  onClick={openUserMenuHandler}
+                >
                   <FaUserNinja />
                 </button>
               </Tooltip>

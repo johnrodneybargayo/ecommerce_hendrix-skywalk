@@ -1,32 +1,40 @@
-// src/components/ProductList/ProductList.tsx
-import React, { useState } from 'react';
-import './productList.scss'; // Import styles for the product list
+// ProductList.tsx
+import React, { useState, useEffect } from 'react';
+import './productList.scss';
+import ProductCard from '../../ProductCard/ProductCard';
+import { useCart } from '../CartContext';
+import Product from '../../../services/Product';
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-}
 
 const ProductList: React.FC = () => {
-  // Sample data for demonstration
-  const sampleProducts: Product[] = Array.from({ length: 15 }, (_, index) => ({
-    id: index + 1,
-    name: `Product ${index + 1}`,
-    price: Math.floor(Math.random() * 50) + 10, // Random price between 10 and 60
-  }));
-
-  const itemsPerPage = 15;
-  const totalPages = Math.ceil(sampleProducts.length / itemsPerPage);
+  const [products, setProducts] = useState<Product[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
+  const { addToCart } = useCart(); // Use the addToCart function from the useCart hook
 
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentProducts = sampleProducts.slice(startIndex, endIndex);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_API_TARGET}/api/products/`);
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const totalPages = Math.ceil(products.length / itemsPerPage);
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentProducts = products.slice(startIndex, endIndex);
 
   return (
     <div className="product-list">
@@ -34,17 +42,22 @@ const ProductList: React.FC = () => {
 
       <div className="product-items">
         {currentProducts.map((product) => (
-          <div key={product.id} className="product-item">
-            <img src={`https://placekitten.com/200/200?image=${product.id}`} alt={`Product ${product.id}`} />
-            <h3>{product.name}</h3>
-            <p>${product.price.toFixed(2)}</p>
-          </div>
+          <ProductCard
+            key={product.id}
+            product={product}
+            onHover={() => {}}
+            addToCart={() => addToCart(product)} // Pass the product to addToCart
+          />
         ))}
       </div>
 
       <div className="pagination">
         {Array.from({ length: totalPages }, (_, index) => (
-          <button key={index + 1} onClick={() => handlePageChange(index + 1)} className={currentPage === index + 1 ? 'active' : ''}>
+          <button
+            key={index + 1}
+            onClick={() => handlePageChange(index + 1)}
+            className={currentPage === index + 1 ? 'active' : ''}
+          >
             {index + 1}
           </button>
         ))}
