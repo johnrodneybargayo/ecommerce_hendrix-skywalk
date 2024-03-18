@@ -5,7 +5,6 @@ import ProductCard from '../../ProductCard/ProductCard';
 import { useCart } from '../CartContext';
 import Product from '../../../services/Product';
 
-
 const ProductList: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -45,7 +44,6 @@ const ProductList: React.FC = () => {
           <ProductCard
             key={product.id}
             product={product}
-            onHover={() => {}}
             addToCart={() => addToCart(product)} // Pass the product to addToCart
           />
         ))}

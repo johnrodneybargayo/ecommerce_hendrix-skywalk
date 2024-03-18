@@ -129,6 +129,11 @@ const Header: React.FC = () => {
                     </Link>
                   </li>
                   <li>
+                    <Link to="/orders" onClick={() => setSubmenuOpen(false)}>
+                      Orders
+                    </Link>
+                  </li>
+                  <li>
                     <button onClick={handleLogout}>Logout</button>
                   </li>
                 </ul>

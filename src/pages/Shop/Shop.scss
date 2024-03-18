@@ -1,4 +1,13 @@
-@import "../../../styles/global.scss";
+@import "../../styles/global.scss";
+
+.shop-continer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  flex-direction: column;
+}
 
 .productlist-section {
   display: flex;
@@ -17,6 +26,12 @@
   flex-wrap: wrap;
   justify-content: space-around;
   margin-top: 20px;
+}
+
+.product-details {
+    margin-top: 10px;
+    display: contents;
+    line-height: 1.5;
 }
 
 .product-item {
@@ -60,7 +75,6 @@
     &.active {
       background-color: #ffcc18;
       color: black;
-  
     }
   }
 }

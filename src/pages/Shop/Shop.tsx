@@ -1,54 +1,68 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import './Shop.scss'; // Import the SCSS file
+import ProductCard from '../../components/ProductCard/ProductCard';
 import Header from '../../components/common/Header/Header';
-import axios from 'axios';
+import Footer from '../../components/common/Footer/Footer';
 import { useCart } from '../../components/Shop/CartContext';
-import AddToCartButton from '../../components/Shop/AddToCartButton';
+import Product from '../../services/Product';
 
 const Shop: React.FC = () => {
-  const { addToCart } = useCart();
-  const [shopData, setShopData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
+  const { addToCart } = useCart(); // Use the addToCart function from the useCart hook
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchProducts = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_TARGET}/api/shop/`);
-        setShopData(response.data);
+        const response = await fetch(`${process.env.REACT_APP_API_TARGET}/api/products/`);
+        const data = await response.json();
+        setProducts(data);
       } catch (error) {
-        console.error('Error fetching shop data from Django:', error);
-        setError('Error fetching shop data. Please try again later.');
-      } finally {
-        setLoading(false);
+        console.error('Error fetching products:', error);
       }
     };
 
-    fetchData();
+    fetchProducts();
   }, []);
 
-  const handleAddToCart = (item: any) => {
-    addToCart({ id: item.id, name: item.name, price: item.price }); // Adjust product properties
-    console.log(`Adding item with id ${item.id} to cart`);
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
   };
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentProducts = products.slice(startIndex, endIndex);
 
   return (
     <div>
       <Header />
-      <h2>Shop Page</h2>
-      {loading && <p>Loading...</p>}
-      {error && <p>Error: {error}</p>}
-      {shopData && shopData.items && shopData.items.map((item: any) => (
-        <div key={item.id}>
-          <h4>{item.name}</h4>
-          <p>{item.description}</p>
-          <p>Price: ${item.price}</p>
-          <AddToCartButton
-            itemId={item.id}
-            quantity={1}
-            addToCart={() => handleAddToCart(item)}
-          />
+      <div className='shop-continer'>
+        <h2 className='shop-header-label'>Merch</h2>
+        <div className="product-items">
+          {currentProducts.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              addToCart={() => addToCart(product)} // Pass the product to addToCart
+            />
+          ))}
         </div>
-      ))}
+        <div className="pagination">
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index + 1}
+              onClick={() => handlePageChange(index + 1)}
+              className={currentPage === index + 1 ? 'active' : ''}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+      </div>
+      <Footer />
     </div>
   );
 };

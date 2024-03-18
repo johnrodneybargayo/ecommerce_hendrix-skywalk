@@ -1,30 +1,59 @@
+/* productCard.scss */
+
 .product-card {
-    /* Add your styling for the product card */
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin: 10px;
-  }
-  
-  .product-image {
-    /* Styling for the product image */
-    max-width: 100%;
-    height: auto;
-  }
-  
-  .product-details {
-    /* Styling for the product details */
-    margin-top: 10px;
-  }
-  
-  .product-name {
-    /* Styling for the product name */
-    font-size: 16px;
-    font-weight: bold;
-  }
-  
-  .product-price {
-    /* Styling for the product price */
-    font-size: 14px;
-    color: #555;
-  }
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  margin: 10px;
+  border: solid 1px;
+  border-radius: 20px;
+  width: 235px;
+  height: 112px;
+  flex-direction: column;
+  transition: box-shadow 0.3s ease-in-out; /* Smooth transition for box-shadow */
+}
+
+.product-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.product-image {
+  /* Styling for the product image */
+  width: 100%;
+  height: auto;
+  border-bottom: 1px solid #ddd;
+}
+
+.product-details {
+  /* Styling for the product details */
+  margin-top: 10px;
+}
+
+.product-name {
+  /* Styling for the product name */
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.price {
+  /* Styling for the product price */
+  font-size: 14px;
+  color: #555;
+}
+
+.product-card button {
+  /* Styling for the Add to Cart button */
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out; /* Smooth transition for background-color */
+}
+
+.product-card button:hover {
+  background-color: #45a049;
+}
