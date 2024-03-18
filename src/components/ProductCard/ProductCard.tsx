@@ -10,7 +10,6 @@ interface Product {
   price: number;
 }
 
-
 interface ProductCardProps {
   product: Product;
   addToCart: (product: Product) => void;
@@ -23,23 +22,30 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, addToCart }) => {
 
   const handleAddToCart = async () => {
     try {
-      const token = localStorage.getItem('authToken');
-      let headers: { 'Content-Type': string; 'Authorization'?: string } = {
-        'Content-Type': 'application/json',
-      };
-  
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      // Retrieve the authentication token from localStorage
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        throw new Error('Authentication token not found');
       }
-  
+
+      // Set authorization headers
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+
+      // Store product information in local storage
+      localStorage.setItem('productToAddToCart', JSON.stringify(product));
+
+      // Send product information using a POST request
       await axios.post(`${process.env.REACT_APP_API_TARGET}/cart/add/`, {
         product_id: product.id,
         quantity: 1 // You may adjust quantity as needed
       }, { headers });
-  
+
       setIsAddedToCart(true);
       addToCart(product);
-    } catch (error: any) { // Specify the type of error as 'any'
+    } catch (error: any) {
       console.error('Error adding product to cart:', error);
       if (error.response) {
         setError(error.response.data.error || 'Error adding product to cart');
@@ -48,7 +54,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, addToCart }) => {
       }
     }
   };
-  
+
   console.log('ProductCard rendered for:', product.name);
 
   return (
