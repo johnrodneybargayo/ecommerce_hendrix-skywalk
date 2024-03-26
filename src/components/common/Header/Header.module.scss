@@ -8,6 +8,7 @@
   width: 100%;
   height: $headerHeight;
   padding: 0;
+  z-index: 1000;
   @include breakpoint(md) {
     padding: 0 4rem;
   }

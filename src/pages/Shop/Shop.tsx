@@ -15,7 +15,7 @@ const Shop: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_TARGET}/api/products/`);
+        const response = await fetch(`http://54.146.118.222:8000/api/products/`);
         const data = await response.json();
         setProducts(data);
       } catch (error) {
@@ -36,6 +36,10 @@ const Shop: React.FC = () => {
   const endIndex = startIndex + itemsPerPage;
   const currentProducts = products.slice(startIndex, endIndex);
 
+  const handleAddToCart = (productId: number) => {
+    addToCart(productId, 1); // Pass the productId and quantity
+  };
+
   return (
     <div>
       <Header />
@@ -46,7 +50,7 @@ const Shop: React.FC = () => {
             <ProductCard
               key={product.id}
               product={product}
-              addToCart={() => addToCart(product)} // Pass the product to addToCart
+              addToCart={() => handleAddToCart(product.id)} // Pass productId to handleAddToCart
             />
           ))}
         </div>

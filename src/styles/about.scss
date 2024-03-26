@@ -7,7 +7,7 @@
     align-items: center;
     padding: 20px;
     position: relative;
-    top: 10rem;
+    top: 5rem;
     z-index: -100;
 
   .frame-container {
@@ -69,9 +69,80 @@ section.videolist-section {
     margin-bottom: 60px;
 }
 
+.hendrix-1 {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  left: 138px;
+}
+
+.hendrix-2 {
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  right: 14rem;
+}
 .frame-1,
 .frame-2 {
-  max-width: 100%;
+  max-width: 500px;
   height: auto;
 }
+
+img.frame-2 {
+  width: 335px;
+  height: 335px;
+}
+
+img.frame-1 {
+  width: 335px;
+  height: 335px;
+}
+
+.hendrix-img-1 {
+  display: flex;
+  width: 125px;
+  height: 149px;
+}
+
+img.hendrix-img-2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 120px;
+}
+
+
+@media only screen and (max-width: 1920px) {
+
+  img.frame-1 {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    left: 5rem;
+    top: 10px;
+}
+
+  .hendrix-1 {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    left: 28rem;
+}
+
+  .hendrix-2 {
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    right: 23rem;
+    top: -6px;
+  }
+
+}
+
 
