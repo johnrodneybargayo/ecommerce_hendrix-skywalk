@@ -18,7 +18,7 @@ const HomePage = () => {
     const fetchData = async () => {
       try {
         const response = await api.get(
-          "http://localhost:8000/api/products/"
+          `${process.env.REACT_APP_API_BASE_PROD}/api/products/`
         );
         console.log(response.data.message);
         setLoading(false);
@@ -46,7 +46,6 @@ const HomePage = () => {
               title="Embedded Video"
               src="https://streamable.com/e/yeuk3h?autoplay=1&muted=1&nocontrols=1"
               allow="fullscreen;autoplay"
-              allowFullScreen
               ref={videoRef}
               style={{
                 border: "none",
@@ -60,9 +59,9 @@ const HomePage = () => {
               }}
             ></iframe>
             <div className="container-text">
-              <h4 className="home-banner-text">How to be a YouTuber?</h4>
+              <h4 className="home-banner-text">How to be <br/> a YouTuber?</h4>
               <p className="home-banner-subtext">
-                Want to know how to start your own YouTube channel?
+                Want to know how to start <br/> your own YouTube channel?
               </p>
               <button className="video-play">Play and Learn</button>
             </div>

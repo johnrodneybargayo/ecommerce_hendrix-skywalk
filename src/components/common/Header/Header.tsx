@@ -83,11 +83,6 @@ const Header: React.FC = () => {
               </Link>
             </li>
             <li>
-              <Link to="/about" title="About">
-                About
-              </Link>
-            </li>
-            <li>
               <Link to="/shop" title="Shop">
                 Shop
               </Link>
@@ -98,7 +93,7 @@ const Header: React.FC = () => {
               </Link>
             </li>
           </ul>
-          <Tooltip text="Cart">
+          <Tooltip text="/Cart">
             <button
               className={classes.btn_cart}
               onClick={toggleCartModal} // Toggle cart modal on click
@@ -147,7 +142,7 @@ const Header: React.FC = () => {
               )}
             </div>
           ) : (
-            <Link to="api/login">
+            <Link to="/login">
               <Tooltip text="Login">
                 <button
                   className={classes.btn_cart}
