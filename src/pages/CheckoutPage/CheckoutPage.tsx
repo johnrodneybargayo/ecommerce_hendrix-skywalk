@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './CheckoutPage.scss';
-import { FaChevronLeft } from 'react-icons/fa';
+import { FaChevronLeft, FaTimes } from 'react-icons/fa';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -20,6 +20,23 @@ interface Product {
     created_at: string;
 }
 
+interface Address {
+    id: number;
+    firstname: string;
+    lastname: string;
+    street_address: string;
+    city: string;
+    state: string;
+    zip_code: string;
+    country: string;
+    company?: string; // Optional property for company
+    house_no?: string; // Optional property for house number
+    apartment?: string; // Optional property for apartment
+    landmark?: string; // Optional property for landmark
+    phone_number?: string; // Optional property for phone number
+}
+
+
 const CheckoutPage: React.FC = () => {
     const [cartItems, setCartItems] = useState<Product[]>([]);
     const [subtotal, setSubtotal] = useState<number>(0);
@@ -28,17 +45,22 @@ const CheckoutPage: React.FC = () => {
     const [shippingOption, setShippingOption] = useState<string>('');
     const [shippingPrice, setShippingPrice] = useState<number>(0);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-    const [userEmail, setUserEmail] = useState<string>('');
+    const [username, setUsername] = useState<string>('');
     const [firstName, setFirstName] = useState<string>('');
     const [lastName, setLastName] = useState<string>('');
+    const [email, setEmail] = useState<string>('');
+    const [houseNo, setHouseNo] = useState<string>('');
+    const [landmark, setLandmark] = useState<string>('');
     const [company, setCompany] = useState<string>('');
-    const [address, setAddress] = useState<string>('');
+    const [streetAddress, setStreetAddress] = useState<string>('');
     const [apartment, setApartment] = useState<string>('');
     const [country, setCountry] = useState<string>('');
     const [city, setCity] = useState<string>('');
     const [state, setState] = useState<string>('');
     const [zipCode, setZipCode] = useState<string>('');
     const [phone, setPhone] = useState<string>('');
+    const [showLoginForm, setShowLoginForm] = useState<boolean>(false);
+    const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -51,7 +73,6 @@ const CheckoutPage: React.FC = () => {
                 console.error('Error fetching cart items:', error);
             }
         };
-
         fetchCartItems();
     }, []);
 
@@ -70,6 +91,51 @@ const CheckoutPage: React.FC = () => {
         fetchCountries();
     }, []);
 
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            const userInfo = localStorage.getItem("userInfo");
+            if (userInfo) {
+                try {
+                    const userInfoData = JSON.parse(userInfo);
+                    setUsername(userInfoData.username ?? "");
+                    setIsLoggedIn(true);
+                    setEmail(userInfoData.email);
+                } catch (error) {
+                    console.error("Error parsing userInfo:", error);
+                }
+            }
+        };
+
+        fetchUserProfile();
+    }, []);
+
+    useEffect(() => {
+        const fetchSavedAddresses = async () => {
+            const userInfo = localStorage.getItem("userInfo");
+            const accessToken = localStorage.getItem("accessToken");
+            const userIsLoggedIn = userInfo !== null && accessToken;
+
+            try {
+                let config = {};
+                if (userIsLoggedIn) {
+                    config = {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`
+                        }
+                    };
+                }
+
+                const response = await axios.get(`${process.env.REACT_APP_API_TARGET_LOCAL}/account/addresses`, config);
+                const addresses = response.data;
+                setSavedAddresses(addresses);
+            } catch (error) {
+                console.error('Error fetching saved addresses:', error);
+            }
+        };
+
+        fetchSavedAddresses();
+    }, []);
+
     const calculateSubtotal = (items: Product[]) => {
         const total = items.reduce((acc: number, curr: Product) => acc + curr.total_price, 0);
         setSubtotal(total);
@@ -80,12 +146,12 @@ const CheckoutPage: React.FC = () => {
     };
 
     const handleContinuePayment = () => {
-        navigate('/payment', { state: { selectedShippingOption: shippingOption } }); // Pass selectedShippingOption as state
+        navigate('/payment', { state: { selectedShippingOption: shippingOption } });
     };
 
     const handleReturnInfo = () => {
-        setShowShippingForm(true); // Show the hidden information form
-        setShippingOption(''); // Clear the selected shipping option
+        setShowShippingForm(true);
+        setShippingOption('');
     };
 
     const handleReturnCart = () => {
@@ -95,7 +161,6 @@ const CheckoutPage: React.FC = () => {
     const handleShippingOptionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedOption = event.target.value;
         setShippingOption(selectedOption);
-        // Set shipping price based on the selected option
         if (selectedOption === 'standard') {
             setShippingPrice(5);
         } else if (selectedOption === 'express') {
@@ -103,26 +168,138 @@ const CheckoutPage: React.FC = () => {
         }
     };
 
-    const handleLogin = () => {
-        // Simulate login process, set isLoggedIn to true and set user email
-        setIsLoggedIn(true);
-        setUserEmail("user@example.com");
-        // Fetch user's shipping info and populate the state variables
-        // Example: fetchShippingInfo();
+    const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const username = formData.get('username') as string;
+        const password = formData.get('password') as string;
+
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_API_BASE_PROD}/account/login/`, {
+                username,
+                password
+            });
+            const userData = response.data;
+            setUsername(userData.username);
+            setIsLoggedIn(true);
+            setShowLoginForm(false);
+        } catch (error) {
+            console.error('Login error:', error);
+        }
     };
 
     const handleLogout = () => {
-        // Simulate logout process, set isLoggedIn to false and clear user email
         setIsLoggedIn(false);
-        setUserEmail("");
-        // Clear shipping info state variables
+        setUsername("");
+        setFirstName("");
+        setLastName("");
+        setCompany("");
+        setStreetAddress("");
+        setApartment("");
+        setCountry("");
+        setCity("");
+        setState("");
+        setZipCode("");
+        setPhone("");
     };
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        // Submit the shipping information
-        // Example: submitShippingInfo();
+
+        const shippingInfo = {
+            firstname: firstName,
+            lastname: lastName,
+            phone_number: phone,
+            zip_code: zipCode,
+            house_no: houseNo,
+            apartment,
+            street_address: streetAddress,
+            landmark,
+            city,
+            state,
+            country,
+            email,
+            company,
+        };
+
+        const userInfo = localStorage.getItem("userInfo");
+        const accessToken = localStorage.getItem("accessToken");
+        const userIsLoggedIn = userInfo !== null && accessToken;
+
+        if (userIsLoggedIn) {
+            try {
+                const billingInfoResponse = await axios.get(`${process.env.REACT_APP_API_TARGET_LOCAL}/account/addresses/`, {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`
+                    }
+                });
+
+                const existingAddresses = billingInfoResponse.data;
+
+                if (existingAddresses.length > 0) {
+                    const addressId = existingAddresses[0].id;
+                    const updateResponse = await axios.put(`${process.env.REACT_APP_API_TARGET_LOCAL}/account/addresses/update/${addressId}/`, shippingInfo, {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`
+                        }
+                    });
+                    console.log("Backend database updated with shipping information:", updateResponse.data);
+                } else {
+                    const createResponse = await axios.post(`${process.env.REACT_APP_API_TARGET_LOCAL}/account/addresses/create/`, shippingInfo, {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`
+                        }
+                    });
+                    console.log("Backend database created with shipping information:", createResponse.data);
+                }
+
+                handleContinueShipping();
+            } catch (error: any) {
+                if (error.response && error.response.status === 401) {
+                    console.error("User is not authorized to access the resource. Redirecting to login page...");
+                } else {
+                    console.error("Error updating or creating shipping information:", error);
+                }
+            }
+        } else {
+            localStorage.setItem("shippingInfo", JSON.stringify(shippingInfo));
+        }
+
+        console.log("Shipping information saved:", shippingInfo);
     };
+
+    const handleLoginButtonClick = () => {
+        setShowLoginForm(true);
+    };
+
+    const [selectedValue, setSelectedValue] = useState<string>('');
+
+    const handleSavedAddressChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedValue = event.target.value;
+
+        if (selectedValue === "new") {
+            // Handle adding a new address
+            setSelectedValue('');
+        } else {
+            // Handle selecting a saved address
+            setSelectedValue(selectedValue);
+            const selectedAddress = JSON.parse(selectedValue) as Address;
+            setFirstName(selectedAddress?.firstname || '');
+            setLastName(selectedAddress?.lastname || '');
+            setCompany(selectedAddress?.company || '');
+            setHouseNo(selectedAddress?.house_no || '');
+            setApartment(selectedAddress?.apartment || '');
+            setStreetAddress(selectedAddress?.street_address || '');
+            setLandmark(selectedAddress?.landmark || '');
+            setCountry(selectedAddress?.country || '');
+            setCity(selectedAddress?.city || '');
+            setState(selectedAddress?.state || '');
+            setZipCode(selectedAddress?.zip_code || '');
+            setPhone(selectedAddress?.phone_number || '');
+        }
+    };
+
+
 
     return (
         <>
@@ -136,24 +313,45 @@ const CheckoutPage: React.FC = () => {
                                 <div className="contact-info">
                                     {isLoggedIn ? (
                                         <>
-                                            <div>Email: {userEmail}</div>
+                                            <div>User: {username}</div>
                                             <button onClick={handleLogout} className='btn-logout-checkout'>Logout</button>
                                         </>
                                     ) : (
-                                        <button onClick={handleLogin} className='btn-login-checkout'>Login</button>
+                                        <button onClick={handleLoginButtonClick} className='btn-login-checkout'>Login</button>
                                     )}
                                 </div>
                                 <form className="checkout-form" onSubmit={handleSubmit}>
                                     <div className="email-checkbox">
-                                        <input type="email" placeholder="Email" required />
-                                        <label className='subscribed'><input className='subscribed-checkbox' type="checkbox" /><p className='subscribed-text'>Email me with news and offers</p></label>
+                                        {isLoggedIn ? (
+                                            <div className="user-email">Email:{email}</div>
+                                        ) : (
+                                            <input type="email" placeholder="Email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                                        )}
+                                        <label className='subscribed'>
+                                            <input className='subscribed-checkbox' type="checkbox" />
+                                            <p className='subscribed-text'>Email me with news and offers</p>
+                                        </label>
                                     </div>
                                     <div className="shipping-address">
+                                        <select onChange={handleSavedAddressChange} value={selectedValue}>
+                                            <option value="" disabled hidden>Select Saved Address</option>
+                                            {savedAddresses.map((address) => (
+                                                <option key={address.id} value={JSON.stringify(address)}>
+                                                    {`${address.firstname} ${address.lastname}, ${address.street_address}, ${address.city}, ${address.state}, ${address.zip_code}, ${address.country}`}
+                                                </option>
+                                            ))}
+                                            <option value="new">Add New Address</option>
+                                        </select>
                                         <input type="text" placeholder="First Name" required value={firstName} onChange={(e) => setFirstName(e.target.value)} />
                                         <input type="text" placeholder="Last Name" required value={lastName} onChange={(e) => setLastName(e.target.value)} />
                                         <input type="text" placeholder="Company (optional)" value={company} onChange={(e) => setCompany(e.target.value)} />
-                                        <input type="text" placeholder="Address" required value={address} onChange={(e) => setAddress(e.target.value)} />
-                                        <input type="text" placeholder="Apartment, suite, etc. (optional)" value={apartment} onChange={(e) => setApartment(e.target.value)} />
+                                        <div className="house-address">
+                                            <input type="text" placeholder="House No." required value={houseNo} onChange={(e) => setHouseNo(e.target.value)} />
+                                            <input type="text" placeholder="Apartment, suite, etc. (optional)" value={apartment} onChange={(e) => setApartment(e.target.value)} />
+                                            <input type="text" placeholder="Landmark" required value={landmark} onChange={(e) => setLandmark(e.target.value)} />
+                                        </div>
+                                        <input type="text" placeholder="Street Address" required value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} />
+
                                         <select value={country} onChange={(e) => setCountry(e.target.value)}>
                                             <option>Country/Region</option>
                                             {countries.sort().map((country, index) => (
@@ -169,7 +367,7 @@ const CheckoutPage: React.FC = () => {
                                     </div>
                                     <div className="checkout-navigation">
                                         <button className='return-btn' type="button" onClick={handleReturnCart}><FaChevronLeft /> Return to Cart</button>
-                                        <button type="submit" onClick={handleContinueShipping}>Continue Shipping</button>
+                                        <button type="submit">Continue Shipping</button>
                                     </div>
                                 </form>
                             </>
@@ -185,16 +383,14 @@ const CheckoutPage: React.FC = () => {
                                         <option value="standard">Standard Delivery - $5.00</option>
                                         <option value="express">Express Delivery - $15.00</option>
                                     </select>
-                                    {/* Display user information and logout button */}
                                     {isLoggedIn && (
                                         <div className="user-info">
-                                            <p>User: {userEmail}</p>
+                                            <p>User: {username}</p>
                                             <button className='checkout-logout-btn' onClick={handleLogout}>Logout</button>
                                         </div>
                                     )}
-                                    {/* Display shipping address */}
                                     <div className="shipping-address-info">
-                                        <p>Ship to: {`${firstName} ${lastName}, ${address}, ${city}, ${state}, ${zipCode}, ${country}`}</p>
+                                        <p>Ship to: {`${firstName} ${lastName}, ${streetAddress}, ${apartment}, ${city}, ${state}, ${zipCode}, ${country}`}</p>
                                         <button className='change-btn' onClick={() => setShowShippingForm(true)}>Change</button>
                                     </div>
                                     <div className="shipping-navigation">
@@ -202,7 +398,18 @@ const CheckoutPage: React.FC = () => {
                                         <button className='continue-btn' type="button" onClick={handleContinuePayment}>Continue Payment</button>
                                     </div>
                                 </div>
-
+                            </div>
+                        )}
+                        {showLoginForm && (
+                            <div className='login-modal'>
+                                <form className="login-modal-content" onSubmit={handleLogin}>
+                                    <button className="close-btn-modal" onClick={() => setShowLoginForm(false)}>
+                                        <FaTimes />
+                                    </button>
+                                    <input type="text" placeholder="Username" name="username" />
+                                    <input type="password" placeholder="Password" name="password" />
+                                    <button className='btn-login-checkout'>Login</button>
+                                </form>
                             </div>
                         )}
                         <div className="links-section">

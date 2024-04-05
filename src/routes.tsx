@@ -11,7 +11,13 @@ import { CartProvider } from '../src/components/Shop/CartContext';
 import ProductDetailsPage from '../src/pages/Product/ProductDetailsPage';
 import Rewards from './pages/Rewards/Rewards';
 import CheckoutPage from './pages/CheckoutPage/CheckoutPage';
-import PaymentPage from './pages/PaymentPage/PaymentPage'; // Import PaymentPage component
+import PaymentPage from './pages/PaymentPage/PaymentPage';
+import SummaryPage from './pages/SummaryPage/SummaryPage';
+import OrdersPage from './pages/OrderPage/OrdersPage'; // Import OrdersPage component
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+
+const stripePromise = loadStripe('YOUR_PUBLISHABLE_KEY');
 
 const AppRoutes: React.FC = () => {
   const [isLoggedIn, setLoggedIn] = useState(false);
@@ -29,8 +35,6 @@ const AppRoutes: React.FC = () => {
         <Route path="/cart" element={<ShoppingCart />} />
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
         <Route path="/rewards" element={<Rewards />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/payment" element={<PaymentPage />} />
         <Route path="/product/:id" element={<ProductDetailsPage />} />
         <Route
           path="/profile"
@@ -46,6 +50,28 @@ const AppRoutes: React.FC = () => {
             )
           }
         />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/payment" element={<Elements stripe={stripePromise}><PaymentPage /></Elements>} />
+        <Route
+          path="/summary"
+          element={
+            <SummaryPage
+              subtotal={100}
+              taxes={10}
+              selectedShippingOption="Standard"
+              total={120}
+              shippingInformation="123 Shipping St, City, Country"
+              customerName="John Doe"
+              orderNumber="123456789"
+              paymentOption="Visa"
+              maskedCardNumber="**** **** **** 1234"
+              cartItems={[]} 
+              shippingPrice={10} 
+            />
+          }
+        />
+        {/* Add the OrdersPage route */}
+        <Route path="/orders" element={<OrdersPage />} />
       </Routes>
     </CartProvider>
   );

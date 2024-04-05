@@ -1,91 +1,68 @@
-import React, { useState } from "react";
-import { FaLock } from "react-icons/fa";
-import styles from "../PaymentCardForm/PaymentCardForm.module.scss";
+import React, { useState } from 'react';
+import { FaLock } from 'react-icons/fa';
+import { CardElement } from '@stripe/react-stripe-js';
+import styles from '../PaymentCardForm/PaymentCardForm.module.scss';
 
-export interface PaymentCardFormProps {
-  onSaveCard: (formData: FormData) => void;
-  showCardDetails?: () => void;
-  payWithSavedCard: () => void;
-  setCardDetails: () => void;
-  setCardDetailsId: () => void;
-  navigateToEditCard: () => void;
-  stripeCards?: any[];
-}
-
-interface FormData {
+export interface PaymentCardFormData {
   name: string;
   cardNumber: string;
-  expMonth: string;
-  expYear: string;
+  expDate: string;
   cvc: string;
   saveCard: boolean;
+  email: string;
 }
 
+interface PaymentCardFormProps {
+  onSaveCard: (formData: PaymentCardFormData) => void;
+  userEmail: string;
+}
 
-
-const PaymentCardForm: React.FC<PaymentCardFormProps> = ({
-  onSaveCard,
-  showCardDetails,
-  payWithSavedCard,
-  setCardDetails,
-  setCardDetailsId,
-  navigateToEditCard,
-}) => {
-  const [name, setName] = useState("");
+const PaymentCardForm: React.FC<PaymentCardFormProps> = ({ onSaveCard, userEmail }) => {
+  const [name, setName] = useState('');
   const [nameTouched, setNameTouched] = useState(false);
-  const [cardNumber, setCardNumber] = useState("");
-  const [expMonth, setExpMonth] = useState("");
-  const [expYear, setExpYear] = useState("");
-  const [cvc, setCVC] = useState("");
+  const [cardNumber, setCardNumber] = useState('');
+  const [expDate, setExpDate] = useState('');
+  const [cvc, setCVC] = useState('');
   const [saveCard, setSaveCard] = useState(false);
+  const [email, setEmail] = useState(userEmail);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // Basic form validation
-    if (name.trim() === "") {
-      setNameTouched(true);
+    // Validate expiration date format
+    const [expMonth, expYear] = expDate.split('/');
+    const currentYear = new Date().getFullYear() % 100;
+    const currentMonth = new Date().getMonth() + 1;
+    const isValidFormat =
+      /^\d{2}\/\d{2}$/.test(expDate) &&
+      +expMonth >= 1 &&
+      +expMonth <= 12 &&
+      +expYear >= currentYear &&
+      (+expYear !== currentYear || +expMonth >= currentMonth);
+
+    if (!isValidFormat) {
+      alert('Please enter a valid expiration date in MM/YY format.');
       return;
     }
 
-    if (cardNumber.trim() === "" || !/\b\d{16}\b/.test(cardNumber.trim())) {
-      alert("Please enter a valid 16-digit card number.");
-      return;
-    }
-
-    if (expMonth.trim() === "" || !/^(0?[1-9]|1[012])$/.test(expMonth.trim())) {
-      alert("Please enter a valid expiration month (MM).");
-      return;
-    }
-
-    if (expYear.trim() === "" || !/^\d{2}$/.test(expYear.trim())) {
-      alert("Please enter a valid expiration year (YY).");
-      return;
-    }
-
-    if (cvc.trim() === "" || !/^\d{3}$/.test(cvc.trim())) {
-      alert("Please enter a valid 3-digit CVC.");
-      return;
-    }
-
-    const formData: FormData = {
-      name,
-      cardNumber,
-      expMonth,
-      expYear,
-      cvc,
-      saveCard,
+    const formData: PaymentCardFormData = {
+      name: name,
+      cardNumber: cardNumber,
+      expDate: expDate,
+      cvc: cvc,
+      saveCard: saveCard,
+      email: email,
     };
 
     onSaveCard(formData);
 
-    setName("");
+    setName('');
     setNameTouched(false);
-    setCardNumber("");
-    setExpMonth("");
-    setExpYear("");
-    setCVC("");
+    setCardNumber('');
+    setExpDate('');
+    setCVC('');
     setSaveCard(false);
+    setEmail('');
   };
 
   const handleNameBlur = () => {
@@ -93,7 +70,7 @@ const PaymentCardForm: React.FC<PaymentCardFormProps> = ({
   };
 
   const isNameValid = () => {
-    return name.trim() !== "";
+    return name.trim() !== '';
   };
 
   return (
@@ -116,34 +93,45 @@ const PaymentCardForm: React.FC<PaymentCardFormProps> = ({
         </div>
         <div className={styles.inputField}>
           <label className={styles.cardLabel}>
-            Card Number:
+            Card Details:
             <div className={styles.iconInput}>
-              <input
-                type="text"
-                value={cardNumber}
-                onChange={(e) => setCardNumber(e.target.value)}
-                className={styles.cardInput}
+              <CardElement
+                options={{
+                  style: {
+                    base: {
+                      fontSize: '16px',
+                      color: '#424770',
+                      '::placeholder': {
+                        color: '#aab7c4',
+                      },
+                    },
+                    invalid: {
+                      color: '#9e2146',
+                    },
+                  },
+                }}
               />
               <FaLock className={styles.icon} />
             </div>
           </label>
         </div>
         <div className={styles.inputField}>
-          <label className={styles.cardLabel}>Exp Month:</label>
+          <label className={styles.cardLabel}>Card Number:</label>
           <input
             type="text"
-            value={expMonth}
-            onChange={(e) => setExpMonth(e.target.value)}
+            value={cardNumber}
+            onChange={(e) => setCardNumber(e.target.value)}
             className={styles.cardInput}
           />
         </div>
         <div className={styles.inputField}>
-          <label className={styles.cardLabel}>Exp Year:</label>
+          <label className={styles.cardLabel}>Exp Date:</label>
           <input
             type="text"
-            value={expYear}
-            onChange={(e) => setExpYear(e.target.value)}
+            value={expDate}
+            onChange={(e) => setExpDate(e.target.value)}
             className={styles.cardInput}
+            placeholder="MM/YY"
           />
         </div>
         <div className={styles.inputField}>
@@ -153,6 +141,15 @@ const PaymentCardForm: React.FC<PaymentCardFormProps> = ({
             value={cvc}
             onChange={(e) => setCVC(e.target.value)}
             className={`${styles.cardInput} ${styles.small}`}
+          />
+        </div>
+        <div className={styles.inputField}>
+          <label className={styles.cardLabel}>Email:</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={styles.cardInput}
           />
         </div>
         <div className={styles.inputField}>
