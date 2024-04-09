@@ -5,13 +5,13 @@ import PlaceOrder from '../../components/PlaceOrder/PlaceOrder';
 interface Product {
   id: number;
   product: {
-    id: number;
-    name: string;
-    description: string;
-    price: number;
-    stock: boolean;
-    image: string;
-    quantity: number;
+      id: number;
+      name: string;
+      description: string;
+      price: number;
+      stock: boolean;
+      image: string;
+      quantity: number;
   };
   quantity: number;
   total_price: number;
@@ -29,7 +29,7 @@ interface SummaryProps {
   paymentOption: string;
   maskedCardNumber: string;
   cartItems: Product[];
-  shippingPrice: number;
+  shippingPrice: number; 
 }
 
 const SummaryPage: React.FC<SummaryProps> = ({
@@ -53,13 +53,12 @@ const SummaryPage: React.FC<SummaryProps> = ({
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    window.location.href = '/orders'; // Redirect to the orders page after closing modal
   };
 
   // Function to calculate total price of all items in cart
   const calculateTotalPrice = () => {
     let totalPrice = 0;
-    cartItems.forEach((item) => {
+    cartItems.forEach(item => {
       totalPrice += item.product.price * item.quantity;
     });
     return totalPrice;
@@ -71,11 +70,7 @@ const SummaryPage: React.FC<SummaryProps> = ({
       <div className="summary-details">
         {cartItems.map((item: Product) => (
           <div key={item.id} className="product-item-summary">
-            <img
-              src={`${process.env.REACT_APP_API_BASE_PROD}${item.product.image}`}
-              alt=""
-              className="cartModal__productImage"
-            />
+            <img src={`${process.env.REACT_APP_API_BASE_PROD}${item.product.image}`} alt="" className="cartModal__productImage" />
             <span>{item.product.name}</span>
             <span>Quantity: {item.quantity}</span>
             <span>Price: ${item.product.price}</span>
@@ -118,9 +113,7 @@ const SummaryPage: React.FC<SummaryProps> = ({
           <span>${calculateTotalPrice()}</span>
         </div>
       </div>
-      <button className="place-order-btn" onClick={handlePlaceOrder}>
-        Place Order
-      </button>
+      <button className="place-order-btn" onClick={handlePlaceOrder}>Place Order</button>
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal">
@@ -144,6 +137,6 @@ const SummaryPage: React.FC<SummaryProps> = ({
       )}
     </div>
   );
-};
+}
 
 export default SummaryPage;

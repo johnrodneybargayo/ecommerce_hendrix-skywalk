@@ -36,7 +36,6 @@ interface Address {
     phone_number?: string; // Optional property for phone number
 }
 
-
 const CheckoutPage: React.FC = () => {
     const [cartItems, setCartItems] = useState<Product[]>([]);
     const [subtotal, setSubtotal] = useState<number>(0);
@@ -66,7 +65,7 @@ const CheckoutPage: React.FC = () => {
     useEffect(() => {
         const fetchCartItems = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_BASE_PROD}/cart/items/`);
+                const response = await axios.get(`${process.env.REACT_APP_API_TARGET_LOCAL}/cart/items/`);
                 setCartItems(response.data);
                 calculateSubtotal(response.data);
             } catch (error) {
@@ -146,8 +145,9 @@ const CheckoutPage: React.FC = () => {
     };
 
     const handleContinuePayment = () => {
-        navigate('/payment', { state: { selectedShippingOption: shippingOption } });
+        navigate('/payment', { state: { cartItems, subtotal: subtotal + shippingPrice, shippingPrice } });
     };
+    
 
     const handleReturnInfo = () => {
         setShowShippingForm(true);
@@ -175,7 +175,7 @@ const CheckoutPage: React.FC = () => {
         const password = formData.get('password') as string;
 
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_BASE_PROD}/account/login/`, {
+            const response = await axios.post(`${process.env.REACT_APP_API_TARGET_LOCAL}/account/login/`, {
                 username,
                 password
             });
@@ -298,8 +298,6 @@ const CheckoutPage: React.FC = () => {
             setPhone(selectedAddress?.phone_number || '');
         }
     };
-
-
 
     return (
         <>
@@ -430,7 +428,8 @@ const CheckoutPage: React.FC = () => {
                                         <div key={item.id} className="product-item-summary">
                                             <img src={`${process.env.REACT_APP_API_BASE_PROD}${item.product.image}`} alt="" className="cartModal__productImage" />
                                             <span>{item.product.name}</span>
-                                            <span>${item.product.price}</span>
+                                            <span>Quantity: {item.quantity}</span>
+                                            <span>Total Price: ${(item.total_price).toFixed(2)}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -439,7 +438,7 @@ const CheckoutPage: React.FC = () => {
                             <div className="fixed-section">
                                 <div className="subtotal">
                                     <span>Subtotal:</span>
-                                    <span>${(subtotal + shippingPrice).toFixed(2)}</span>
+                                    <span>${(subtotal).toFixed(2)}</span>
                                 </div>
                                 <div className="shipping-info">
                                     <span>Shipping:</span>
@@ -459,3 +458,4 @@ const CheckoutPage: React.FC = () => {
 };
 
 export default CheckoutPage;
+

@@ -13,6 +13,7 @@ import Rewards from './pages/Rewards/Rewards';
 import CheckoutPage from './pages/CheckoutPage/CheckoutPage';
 import PaymentPage from './pages/PaymentPage/PaymentPage';
 import SummaryPage from './pages/SummaryPage/SummaryPage';
+import SuccessPaymentPage from './pages/PaymentPage/Success/SuccessPaymentPage'; // Import SuccessPaymentPage component
 import OrdersPage from './pages/OrderPage/OrdersPage'; // Import OrdersPage component
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
@@ -66,12 +67,12 @@ const AppRoutes: React.FC = () => {
               paymentOption="Visa"
               maskedCardNumber="**** **** **** 1234"
               cartItems={[]} 
-              shippingPrice={10} 
+              shippingPrice={10}
             />
           }
         />
-        {/* Add the OrdersPage route */}
-        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/orders" element={<OrdersPage />} /> {/* Route for OrdersPage */}
+        <Route path="/success" element={<SuccessPaymentPage />} /> {/* Route for SuccessPaymentPage */}
       </Routes>
     </CartProvider>
   );
